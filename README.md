@@ -2,14 +2,14 @@
 
 A modern, responsive personal portfolio website for **Zhuoli Yang (杨卓力)**, high school student (Class of 2027) passionate about life sciences, comparative osteology, vivarium ecology, and molecular biotechnology.
 
-Live Deployment: Ready for [Vercel](https://vercel.com/) via [`yangdrew028/zhuoliyang-web`](https://github.com/yangdrew028/zhuoliyang-web).
+Live Deployment: Hosted on [GitHub Pages](https://yangdrew028.github.io/zhuoliyang-web/) via [`yangdrew028/zhuoliyang-web`](https://github.com/yangdrew028/zhuoliyang-web).
 
 ---
 
 ## 🌟 Key Features
 
-- **Zero-Build Static Architecture**: Pure modern HTML5 + Tailwind CSS (via CDN) + Vanilla JS + Lucide vector icons.
-- **Vercel Optimized**: Configured with [`vercel.json`](./vercel.json) for instant, zero-configuration deployment.
+- **Pure Static Git Architecture**: Pure modern HTML5 + Tailwind CSS (via CDN) + Vanilla JS + Lucide vector icons. Zero build tools or compilation steps required.
+- **GitHub Pages Ready**: 100% compatible with GitHub Pages out-of-the-box.
 - **Academic Narrative**: Highlights hands-on biology projects (*Hydrocynus goliath* skeleton articulation, vivarium diagnostic husbandry, biomechanical inquiry), standardized academic excellence (Midterm Rank #11 in grade cohort, Chemistry 97, Biology 95, TOEFL 93), and multidisciplinary talents (Saxophone Grade 10, WIMUN NY @ UN Headquarters).
 - **Interactive Capabilities**:
   - Light / Dark Mode toggle with preference persistence in `localStorage`.
@@ -37,20 +37,16 @@ Then visit [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## ☁️ Deploying to Vercel
+## 🌐 Deploying with GitHub Pages (100% Free inside GitHub)
 
-1. Push your latest commits to GitHub:
-   ```bash
-   git add .
-   git commit -m "feat: initial website scaffold and AGENTS.md"
-   git push origin main
+1. Go to your repository on GitHub: [`yangdrew028/zhuoliyang-web`](https://github.com/yangdrew028/zhuoliyang-web)
+2. Click **Settings** -> **Pages** (in the left sidebar).
+3. Under **Branch**, select `main` and folder `/(root)`, then click **Save**.
+4. In about 1 minute, your site will be live at:
+   ```text
+   https://yangdrew028.github.io/zhuoliyang-web/
    ```
-2. In the [Vercel Dashboard](https://vercel.com/):
-   - Click **Add New...** -> **Project**.
-   - Select the `zhuoliyang-web` repository.
-   - Framework Preset: **Other** (leave build command empty).
-   - Click **Deploy**.
-3. Any future `git push` to `main` will automatically trigger a new deployment.
+5. Any future `git push` to `main` will automatically update the live site.
 
 ---
 

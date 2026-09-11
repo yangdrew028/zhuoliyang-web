@@ -40,9 +40,8 @@ The website serves as an authentic, scholarly, and visually compelling digital p
 - **Stack**: Pure Modern Static Web (HTML5, Tailwind CSS via CDN, Vanilla JavaScript, Lucide Icons).
 - **Zero-Build Architecture**: No Node.js or heavy compilation steps required locally. Files can be opened directly or previewed with `python -m http.server 3000`.
 - **Hosting & CI/CD**:
-  - Hosted on **Vercel** via GitHub integration (`git@github.com:yangdrew028/zhuoliyang-web.git`).
-  - Configured with `vercel.json` for clean routing and security headers.
-  - Every push to `main` triggers an automatic, zero-config production deployment on Vercel.
+  - Hosted on **GitHub Pages** via repository `https://github.com/yangdrew028/zhuoliyang-web`.
+  - Every push to `main` updates the live site automatically with zero build config.
 
 ---
 
@@ -68,7 +67,6 @@ The website serves as an authentic, scholarly, and visually compelling digital p
 zhuoliyang-web/
 ├── AGENTS.md             # This agent instruction document
 ├── README.md             # Developer & user guide
-├── vercel.json           # Vercel deployment configuration
 ├── index.html            # Main portfolio page
 ├── styles.css            # Custom CSS & theme styles
 ├── script.js             # Interactive behaviors & dark mode
