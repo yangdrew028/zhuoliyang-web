@@ -68,7 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let height = (canvas.height = canvas.parentElement.offsetHeight);
     let particles = [];
     const particleCount = Math.min(Math.floor(width / 22), 45);
-
     let mouse = { x: null, y: null, radius: 120 };
 
     window.addEventListener('resize', () => {
@@ -161,7 +160,75 @@ document.addEventListener('DOMContentLoaded', () => {
     animateParticles();
   }
 
-  // ==================== 4. DYNAMIC TYPEWRITER EFFECT ====================
+  // ==================== 4. 3D ROTATING DNA HELIX CANVAS (PROFILE CARD) ====================
+  const dnaCanvas = document.getElementById('dna-canvas');
+  if (dnaCanvas) {
+    const ctx = dnaCanvas.getContext('2d');
+    let width = (dnaCanvas.width = dnaCanvas.offsetWidth || 300);
+    let height = (dnaCanvas.height = dnaCanvas.offsetHeight || 160);
+    let angle = 0;
+
+    window.addEventListener('resize', () => {
+      if (dnaCanvas.offsetWidth) {
+        width = dnaCanvas.width = dnaCanvas.offsetWidth;
+        height = dnaCanvas.height = dnaCanvas.offsetHeight;
+      }
+    });
+
+    function drawDNA() {
+      ctx.clearRect(0, 0, width, height);
+      const centerX = width / 2;
+      const numNodes = 14;
+      const stepY = (height - 30) / numNodes;
+      const radius = Math.min(width * 0.28, 55);
+
+      angle += 0.022;
+
+      for (let i = 0; i < numNodes; i++) {
+        const y = 15 + i * stepY;
+        const currentAngle = angle + (i * 0.45);
+
+        // Strand 1
+        const x1 = centerX + Math.cos(currentAngle) * radius;
+        const z1 = Math.sin(currentAngle);
+        const scale1 = (z1 + 2) / 3;
+
+        // Strand 2 (180 deg out of phase)
+        const x2 = centerX + Math.cos(currentAngle + Math.PI) * radius;
+        const z2 = Math.sin(currentAngle + Math.PI);
+        const scale2 = (z2 + 2) / 3;
+
+        // Draw connecting base-pair rung
+        ctx.beginPath();
+        ctx.moveTo(x1, y);
+        ctx.lineTo(x2, y);
+        const rungAlpha = Math.max(0.15, (scale1 + scale2) / 3.5);
+        ctx.strokeStyle = document.documentElement.classList.contains('dark')
+          ? `rgba(52, 211, 153, ${rungAlpha * 0.6})`
+          : `rgba(5, 150, 105, ${rungAlpha * 0.5})`;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Node 1 (Emerald)
+        ctx.beginPath();
+        ctx.arc(x1, y, 3.5 * scale1, 0, Math.PI * 2);
+        ctx.fillStyle = z1 > 0 ? '#10b981' : '#059669';
+        ctx.fill();
+
+        // Node 2 (Cyan)
+        ctx.beginPath();
+        ctx.arc(x2, y, 3.5 * scale2, 0, Math.PI * 2);
+        ctx.fillStyle = z2 > 0 ? '#06b6d4' : '#0891b2';
+        ctx.fill();
+      }
+
+      requestAnimationFrame(drawDNA);
+    }
+
+    drawDNA();
+  }
+
+  // ==================== 5. DYNAMIC TYPEWRITER EFFECT ====================
   const typewriterTarget = document.getElementById('typewriter-text');
   if (typewriterTarget) {
     const phrases = [
@@ -203,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(typeLoop, 2500);
   }
 
-  // ==================== 5. NUMBER COUNTING ANIMATION ====================
+  // ==================== 6. NUMBER COUNTING ANIMATION ====================
   const countElements = document.querySelectorAll('[data-counter-target]');
   let hasAnimatedCounters = false;
 
@@ -217,7 +284,6 @@ document.addEventListener('DOMContentLoaded', () => {
       function update(now) {
         const elapsed = now - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        // easeOutExpo
         const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
         const current = ease * target;
 
@@ -246,7 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
     counterObserver.observe(statsRibbon);
   }
 
-  // ==================== 6. SCROLL REVEAL ANIMATIONS ====================
+  // ==================== 7. SCROLL REVEAL ANIMATIONS ====================
   const revealElements = document.querySelectorAll('.reveal');
   const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -258,18 +324,91 @@ document.addEventListener('DOMContentLoaded', () => {
 
   revealElements.forEach(el => revealObserver.observe(el));
 
-  // ==================== 7. INTERACTIVE MOUSE GLOW ON CARDS ====================
-  document.querySelectorAll('.interactive-card').forEach(card => {
+  // ==================== 8. 3D TILT EFFECT ON CARDS ====================
+  document.querySelectorAll('.tilt-card').forEach(card => {
     card.addEventListener('mousemove', (e) => {
       const rect = card.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
+      
+      // Update mouse glow coordinates
       card.style.setProperty('--mouse-x', `${x}px`);
       card.style.setProperty('--mouse-y', `${y}px`);
+
+      // Calculate 3D tilt angle
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const rotateX = ((y - centerY) / centerY) * -5;
+      const rotateY = ((x - centerX) / centerX) * 5;
+
+      card.style.transform = `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-4px)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px)';
     });
   });
 
-  // ==================== 8. MOBILE MENU TOGGLE ====================
+  // ==================== 9. LIVE VIVARIUM TELEMETRY SIMULATION ====================
+  const tempEl = document.getElementById('telemetry-temp');
+  const phEl = document.getElementById('telemetry-ph');
+  const tdsEl = document.getElementById('telemetry-tds');
+
+  if (tempEl && phEl && tdsEl) {
+    setInterval(() => {
+      // Fluctuate slightly to reflect live bio-system readings
+      const baseTemp = 24.6 + (Math.random() * 0.4 - 0.2);
+      const basePH = 6.82 + (Math.random() * 0.06 - 0.03);
+      const baseTDS = Math.floor(142 + (Math.random() * 4 - 2));
+
+      tempEl.textContent = baseTemp.toFixed(1) + '°C';
+      phEl.textContent = basePH.toFixed(2);
+      tdsEl.textContent = baseTDS + ' ppm';
+    }, 2800);
+  }
+
+  // ==================== 10. INTERACTIVE ARTICULATION STEPPER ====================
+  const stepBtns = document.querySelectorAll('.stepper-btn');
+  const stepInfo = document.getElementById('stepper-info');
+
+  const stepData = [
+    {
+      title: 'Phase 1: Controlled Soft Tissue Clearance',
+      desc: 'Manual separation of musculature and connective membranes preserving delicate hyoid and fin rays.'
+    },
+    {
+      title: 'Phase 2: NaOH Lipid Saponification (Carp Trial)',
+      desc: 'Tested serial dilutions of sodium hydroxide on Carassius carassius to safely strip fats without dissolving osteological sutures.'
+    },
+    {
+      title: 'Phase 3: Mild H2O2 Oxidation & Degreasing',
+      desc: 'Controlled sub-immersion bleaching preventing chalking and preserving micro-articular condyles.'
+    },
+    {
+      title: 'Phase 4: Kinematic Articulation & Spinal Alignment',
+      desc: 'Topological reconstruction matching unfamiliar joints by structural motion constraints.'
+    }
+  ];
+
+  stepBtns.forEach((btn, index) => {
+    btn.addEventListener('click', () => {
+      stepBtns.forEach(b => b.classList.remove('bg-emerald-600', 'text-white', 'shadow-sm'));
+      stepBtns.forEach(b => b.classList.add('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300'));
+      
+      btn.classList.remove('bg-slate-100', 'dark:bg-slate-800', 'text-slate-600', 'dark:text-slate-300');
+      btn.classList.add('bg-emerald-600', 'text-white', 'shadow-sm');
+
+      if (stepInfo) {
+        stepInfo.style.opacity = '0';
+        setTimeout(() => {
+          stepInfo.innerHTML = `<strong>${stepData[index].title}:</strong> ${stepData[index].desc}`;
+          stepInfo.style.opacity = '1';
+        }, 150);
+      }
+    });
+  });
+
+  // ==================== 11. MOBILE MENU TOGGLE ====================
   const mobileMenuBtn = document.getElementById('mobile-menu-btn');
   const mobileMenu = document.getElementById('mobile-menu');
   const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
@@ -286,7 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ==================== 9. PROJECT FILTER BUTTONS ====================
+  // ==================== 12. PROJECT FILTER BUTTONS ====================
   const filterBtns = document.querySelectorAll('.filter-btn');
   const projectCards = document.querySelectorAll('.project-card');
 
@@ -309,7 +448,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // ==================== 10. MODAL DEEP DIVE SYSTEM ====================
+  // ==================== 13. MODAL DEEP DIVE SYSTEM ====================
   const modal = document.getElementById('project-modal');
   const modalTitle = document.getElementById('modal-title');
   const modalCategory = document.getElementById('modal-category');
@@ -398,7 +537,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ==================== 11. COPY EMAIL TOAST ====================
+  // ==================== 14. COPY EMAIL TOAST ====================
   const copyEmailBtn = document.getElementById('copy-email-btn');
   const toast = document.getElementById('copy-toast');
 
