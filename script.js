@@ -1,7 +1,7 @@
-// Script for Zhuoli Yang's Portfolio Website
+// Dynamic Script for Zhuoli Yang's Portfolio Website
 
 document.addEventListener('DOMContentLoaded', () => {
-  // 1. Dark Mode Initialization & Toggle
+  // ==================== 1. DARK MODE TOGGLE ====================
   const themeToggleBtn = document.getElementById('theme-toggle');
   const themeIconSun = document.getElementById('theme-icon-sun');
   const themeIconMoon = document.getElementById('theme-icon-moon');
@@ -20,23 +20,256 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Detect saved preference or system default
   const savedTheme = localStorage.getItem('zy_theme');
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-    applyTheme(true);
-  } else {
-    applyTheme(false);
-  }
+  applyTheme(savedTheme === 'dark' || (!savedTheme && prefersDark));
 
   if (themeToggleBtn) {
     themeToggleBtn.addEventListener('click', () => {
-      const isCurrentlyDark = document.documentElement.classList.contains('dark');
-      applyTheme(!isCurrentlyDark);
+      applyTheme(!document.documentElement.classList.contains('dark'));
     });
   }
 
-  // 2. Mobile Menu Toggle
+  // ==================== 2. READING PROGRESS BAR & BACK TO TOP ====================
+  const progressBar = document.getElementById('scroll-progress');
+  const backToTopBtn = document.getElementById('back-to-top');
+
+  window.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    
+    if (progressBar) {
+      progressBar.style.width = scrollPercent + '%';
+    }
+
+    if (backToTopBtn) {
+      if (scrollTop > 350) {
+        backToTopBtn.classList.remove('opacity-0', 'pointer-events-none');
+        backToTopBtn.classList.add('opacity-100');
+      } else {
+        backToTopBtn.classList.add('opacity-0', 'pointer-events-none');
+        backToTopBtn.classList.remove('opacity-100');
+      }
+    }
+  }, { passive: true });
+
+  if (backToTopBtn) {
+    backToTopBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+
+  // ==================== 3. BIOLOGICAL PARTICLE CANVAS (HERO) ====================
+  const canvas = document.getElementById('bio-canvas');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    let width = (canvas.width = canvas.parentElement.offsetWidth);
+    let height = (canvas.height = canvas.parentElement.offsetHeight);
+    let particles = [];
+    const particleCount = Math.min(Math.floor(width / 22), 45);
+
+    let mouse = { x: null, y: null, radius: 120 };
+
+    window.addEventListener('resize', () => {
+      if (!canvas.parentElement) return;
+      width = canvas.width = canvas.parentElement.offsetWidth;
+      height = canvas.height = canvas.parentElement.offsetHeight;
+    });
+
+    canvas.parentElement.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+    });
+
+    canvas.parentElement.addEventListener('mouseleave', () => {
+      mouse.x = null;
+      mouse.y = null;
+    });
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.vx = (Math.random() - 0.5) * 0.7;
+        this.vy = (Math.random() - 0.5) * 0.7;
+        this.radius = Math.random() * 2 + 1.2;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.x < 0 || this.x > width) this.vx = -this.vx;
+        if (this.y < 0 || this.y > height) this.vy = -this.vy;
+
+        if (mouse.x !== null && mouse.y !== null) {
+          const dx = mouse.x - this.x;
+          const dy = mouse.y - this.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < mouse.radius) {
+            const angle = Math.atan2(dy, dx);
+            this.x -= Math.cos(angle) * 1.5;
+            this.y -= Math.sin(angle) * 1.5;
+          }
+        }
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = document.documentElement.classList.contains('dark')
+          ? 'rgba(52, 211, 153, 0.45)'
+          : 'rgba(5, 150, 105, 0.35)';
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < particleCount; i++) {
+      particles.push(new Particle());
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, width, height);
+
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 90) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            const alpha = (1 - dist / 90) * 0.22;
+            ctx.strokeStyle = document.documentElement.classList.contains('dark')
+              ? `rgba(52, 211, 153, ${alpha})`
+              : `rgba(5, 150, 105, ${alpha})`;
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(animateParticles);
+    }
+
+    animateParticles();
+  }
+
+  // ==================== 4. DYNAMIC TYPEWRITER EFFECT ====================
+  const typewriterTarget = document.getElementById('typewriter-text');
+  if (typewriterTarget) {
+    const phrases = [
+      'Molecular Mechanism.',
+      'Biomechanical Function.',
+      'Ecological Balance.',
+      'Osteological Kinematics.'
+    ];
+    let phraseIndex = 0;
+    let charIndex = phrases[0].length;
+    let isDeleting = true;
+    let speed = 90;
+
+    function typeLoop() {
+      const currentPhrase = phrases[phraseIndex];
+
+      if (isDeleting) {
+        charIndex--;
+        typewriterTarget.textContent = currentPhrase.substring(0, charIndex);
+        speed = 45;
+      } else {
+        charIndex++;
+        typewriterTarget.textContent = currentPhrase.substring(0, charIndex);
+        speed = 85;
+      }
+
+      if (!isDeleting && charIndex === currentPhrase.length) {
+        speed = 2200; // Pause at full word
+        isDeleting = true;
+      } else if (isDeleting && charIndex === 0) {
+        isDeleting = false;
+        phraseIndex = (phraseIndex + 1) % phrases.length;
+        speed = 400; // Pause before typing new word
+      }
+
+      setTimeout(typeLoop, speed);
+    }
+
+    setTimeout(typeLoop, 2500);
+  }
+
+  // ==================== 5. NUMBER COUNTING ANIMATION ====================
+  const countElements = document.querySelectorAll('[data-counter-target]');
+  let hasAnimatedCounters = false;
+
+  function runCounters() {
+    countElements.forEach(el => {
+      const target = parseFloat(el.getAttribute('data-counter-target'));
+      const isFloat = el.getAttribute('data-counter-target').includes('.');
+      const duration = 1400;
+      const startTime = performance.now();
+
+      function update(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        // easeOutExpo
+        const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+        const current = ease * target;
+
+        el.textContent = isFloat ? current.toFixed(1) : Math.floor(current);
+
+        if (progress < 1) {
+          requestAnimationFrame(update);
+        } else {
+          el.textContent = isFloat ? target.toFixed(1) : target;
+        }
+      }
+
+      requestAnimationFrame(update);
+    });
+  }
+
+  const statsRibbon = document.getElementById('stats-ribbon');
+  if (statsRibbon) {
+    const counterObserver = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !hasAnimatedCounters) {
+        hasAnimatedCounters = true;
+        runCounters();
+        counterObserver.disconnect();
+      }
+    }, { threshold: 0.3 });
+    counterObserver.observe(statsRibbon);
+  }
+
+  // ==================== 6. SCROLL REVEAL ANIMATIONS ====================
+  const revealElements = document.querySelectorAll('.reveal');
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('revealed');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  revealElements.forEach(el => revealObserver.observe(el));
+
+  // ==================== 7. INTERACTIVE MOUSE GLOW ON CARDS ====================
+  document.querySelectorAll('.interactive-card').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      card.style.setProperty('--mouse-x', `${x}px`);
+      card.style.setProperty('--mouse-y', `${y}px`);
+    });
+  });
+
+  // ==================== 8. MOBILE MENU TOGGLE ====================
   const mobileMenuBtn = document.getElementById('mobile-menu-btn');
   const mobileMenu = document.getElementById('mobile-menu');
   const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
@@ -53,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 3. Project Filter Buttons
+  // ==================== 9. PROJECT FILTER BUTTONS ====================
   const filterBtns = document.querySelectorAll('.filter-btn');
   const projectCards = document.querySelectorAll('.project-card');
 
@@ -76,7 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 4. Modal Deep Dive System
+  // ==================== 10. MODAL DEEP DIVE SYSTEM ====================
   const modal = document.getElementById('project-modal');
   const modalTitle = document.getElementById('modal-title');
   const modalCategory = document.getElementById('modal-category');
@@ -120,7 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
           </div>
 
-          <p><strong>Literature Synthesis:</strong> Cross-referenced academic husbandry literature and veterinary care guidelines in both English and Chinese to establish rigorous quarantine and biological safety protocols.</p>
+          <p><strong>Literature Synthesis:</strong> Cross-referenced academic husbandry literature and veterinary care guides in both English and Chinese to establish rigorous quarantine and biological safety protocols.</p>
         </div>
       `
     },
@@ -134,22 +367,11 @@ document.addEventListener('DOMContentLoaded', () => {
           <p><strong>Aspirations:</strong> Looking forward to applying advanced biophysical and molecular assays (e.g., cryo-EM, mass spectrometry, CRISPR mutagenesis) during undergraduate studies to quantitatively probe these structure-function relationships.</p>
         </div>
       `
-    },
-    'wimun': {
-      title: 'WFUNA International Model UN (WIMUN NY 2024)',
-      category: 'Global Perspectives & Leadership',
-      content: `
-        <div class="space-y-4 text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
-          <p><strong>Location:</strong> United Nations Headquarters, New York City (Jan-Feb 2024).</p>
-          <p><strong>Role:</strong> Student Delegate representing Switzerland in the Second Committee (Economic and Financial Committee).</p>
-          <p><strong>Key Activities:</strong> Debated multilateral economic resolutions with 800+ international high school delegates, negotiated consensus amendments, and drafted balanced clauses addressing sustainable economic resilience under the standard UN rules of procedure.</p>
-        </div>
-      `
     }
   };
 
   document.querySelectorAll('.open-modal-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', () => {
       const id = btn.getAttribute('data-project');
       const details = projectDetails[id];
       if (details && modal) {
@@ -176,7 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 5. Copy Email Toast
+  // ==================== 11. COPY EMAIL TOAST ====================
   const copyEmailBtn = document.getElementById('copy-email-btn');
   const toast = document.getElementById('copy-toast');
 
@@ -194,7 +416,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Initialize Lucide Icons if available
+  // Initialize Lucide Icons
   if (window.lucide) {
     window.lucide.createIcons();
   }

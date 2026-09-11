@@ -22,7 +22,8 @@
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border-light);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, box-shadow;
 }
 
 .dark .glass-card {
@@ -31,12 +32,12 @@
 }
 
 .glass-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 16px 32px -8px rgba(5, 150, 105, 0.12);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 35px -10px rgba(5, 150, 105, 0.15);
 }
 
 .dark .glass-card:hover {
-  box-shadow: 0 16px 32px -8px rgba(16, 185, 129, 0.15);
+  box-shadow: 0 20px 35px -10px rgba(16, 185, 129, 0.2);
 }
 
 /* Biological pattern backdrop decoration */
@@ -66,11 +67,12 @@
   padding: 2rem 1.5rem;
   position: relative;
   overflow: hidden;
-  transition: border-color 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .specimen-placeholder:hover {
-  border-color: rgba(16, 185, 129, 0.7);
+  border-color: rgba(16, 185, 129, 0.8);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(6, 182, 212, 0.12) 100%);
 }
 
 /* Quote highlight ribbon */
@@ -116,10 +118,63 @@
   }
   50% {
     opacity: 0.6;
-    transform: scale(1.05);
+    transform: scale(1.08);
   }
 }
 
 .animate-bio-pulse {
-  animation: bio-pulse 3s infinite ease-in-out;
+  animation: bio-pulse 2.5s infinite ease-in-out;
+}
+
+/* Scroll reveal animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Dynamic typing cursor blink */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.typewriter-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  background-color: #10b981;
+  margin-left: 3px;
+  vertical-align: -0.15em;
+  animation: blink 0.8s infinite;
+}
+
+/* Mouse glow follow on cards */
+.interactive-card {
+  position: relative;
+}
+
+.interactive-card::before {
+  content: '';
+  position: absolute;
+  top: var(--mouse-y, -100px);
+  left: var(--mouse-x, -100px);
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.interactive-card:hover::before {
+  opacity: 1;
 }
