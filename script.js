@@ -140,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
       category: 'Global Perspectives & Leadership',
       content: `
         <div class="space-y-4 text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
-          <p><strong>Location:</strong> United Nations Headquarters, New York City (Jan–Feb 2024).</p>
+          <p><strong>Location:</strong> United Nations Headquarters, New York City (Jan-Feb 2024).</p>
           <p><strong>Role:</strong> Student Delegate representing Switzerland in the Second Committee (Economic and Financial Committee).</p>
           <p><strong>Key Activities:</strong> Debated multilateral economic resolutions with 800+ international high school delegates, negotiated consensus amendments, and drafted balanced clauses addressing sustainable economic resilience under the standard UN rules of procedure.</p>
         </div>
